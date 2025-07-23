@@ -3,7 +3,7 @@ const qrcodegen=function(){"use strict";function t(r,n){if(1>r||r>40||0>n||n>3)t
 
 // Main application script
 document.addEventListener('DOMContentLoaded', () => {
-    // --- MASTER TOOL LIST (100 Tools) ---
+    // --- MASTER TOOL LIST ---
     const tools = [
         {id:'imageConverter',name:'Image Converter',description:'Convert images between JPG, PNG, and WEBP formats.',category:'Image & Media Tools',tags:['image','media','converter','jpg','png','webp','format']},
         {id:'imageCompressor',name:'Image Compressor',description:'Reduce image file size with quality settings.',category:'Image & Media Tools',tags:['image','media','compress','reduce','size','quality','jpeg']},
@@ -102,33 +102,57 @@ document.addEventListener('DOMContentLoaded', () => {
     closeButton.addEventListener('click', () => modal.style.display = 'none');
     window.addEventListener('click', (event) => { if (event.target === modal) modal.style.display = 'none'; });
 
-    function openTool(toolId, toolName) {
-        // === AD CODE 2 (300x250 MODAL BANNER) YAHAN ADD KIYA GAYA HAI ===
-        const adCodeForModal = `
-            <div class="ad-container">
-                <script type="text/javascript">
-                    atOptions = {
-                        'key' : 'e27b43d908bed8c11b9385723a061dfc',
-                        'format' : 'iframe',
-                        'height' : 250,
-                        'width' : 300,
-                        'params' : {}
-                    };
-                <\/script>
-                <script type="text/javascript" src="//www.highperformanceformat.com/e27b43d908bed8c11b9385723a061dfc/invoke.js"><\/script>
-            </div>
+    // === NAYA CODE YAHAN SE SHURU HOTA HAI ===
+    
+    // Yeh function dynamically ad script ko load karega
+    function loadModalAd(container) {
+        // Purane ad ko saaf karein (agar koi ho)
+        container.innerHTML = '';
+        
+        // Configuration wala script banayein
+        const configScript = document.createElement('script');
+        configScript.type = 'text/javascript';
+        configScript.innerHTML = `
+            atOptions = {
+                'key' : 'e27b43d908bed8c11b9385723a061dfc',
+                'format' : 'iframe',
+                'height' : 250,
+                'width' : 300,
+                'params' : {}
+            };
         `;
-        // ================================================================
+
+        // External invoke script banayein
+        const externalScript = document.createElement('script');
+        externalScript.type = 'text/javascript';
+        externalScript.src = "//www.highperformanceformat.com/e27b43d908bed8c11b9385723a061dfc/invoke.js";
+        
+        // Dono scripts ko container mein add karein
+        container.appendChild(configScript);
+        container.appendChild(externalScript);
+    }
+    
+    function openTool(toolId, toolName) {
+        // Ab hum ad code ko string mein nahi, balki ek khali container mein daalenge
+        const adContainerHTML = `<div id="modal-ad-container" class="ad-container"></div>`;
 
         modalBody.innerHTML = `<h2>${toolName}</h2>` 
                             + (toolImplementations[toolId]?.html || `<div class="status">This tool is under development.</div>`)
-                            + adCodeForModal;
+                            + adContainerHTML; // Khali container ko yahan joda gaya hai
 
         modal.style.display = 'block';
+
+        // Naye function ko call karke ad load karein
+        const adContainer = document.getElementById('modal-ad-container');
+        if (adContainer) {
+            loadModalAd(adContainer);
+        }
+        
         if (toolImplementations[toolId]?.attach) {
             toolImplementations[toolId].attach();
         }
     }
+    // === NAYA CODE YAHAN KHATAM HOTA HAI ===
     
     // --- TOOL IMPLEMENTATIONS (SABHI TOOLS KA CODE) ---
     const toolImplementations = {
