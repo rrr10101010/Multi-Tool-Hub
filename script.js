@@ -58,6 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoryFilter = document.getElementById('categoryFilter');
     const noResults = document.getElementById('noResults');
     const loadingMessage = document.getElementById('loadingMessage');
+    const permanentAdHolder = document.getElementById('permanent-ad-holder');
+    const modalAdContent = document.getElementById('modal-ad-content');
 
     loadingMessage.style.display = 'none';
 
@@ -99,60 +101,32 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('input', filterTools);
     categoryFilter.addEventListener('change', filterTools);
     
-    closeButton.addEventListener('click', () => modal.style.display = 'none');
-    window.addEventListener('click', (event) => { if (event.target === modal) modal.style.display = 'none'; });
-
-    // === NAYA CODE YAHAN SE SHURU HOTA HAI ===
-    
-    // Yeh function dynamically ad script ko load karega
-    function loadModalAd(container) {
-        // Purane ad ko saaf karein (agar koi ho)
-        container.innerHTML = '';
-        
-        // Configuration wala script banayein
-        const configScript = document.createElement('script');
-        configScript.type = 'text/javascript';
-        configScript.innerHTML = `
-            atOptions = {
-                'key' : 'e27b43d908bed8c11b9385723a061dfc',
-                'format' : 'iframe',
-                'height' : 250,
-                'width' : 300,
-                'params' : {}
-            };
-        `;
-
-        // External invoke script banayein
-        const externalScript = document.createElement('script');
-        externalScript.type = 'text/javascript';
-        externalScript.src = "//www.highperformanceformat.com/e27b43d908bed8c11b9385723a061dfc/invoke.js";
-        
-        // Dono scripts ko container mein add karein
-        container.appendChild(configScript);
-        container.appendChild(externalScript);
+    function closeModal() {
+        modal.style.display = 'none';
+        // Ad ko wapas uske permanent ghar mein bhej do
+        if(modalAdContent) {
+            permanentAdHolder.appendChild(modalAdContent);
+        }
     }
-    
-    function openTool(toolId, toolName) {
-        // Ab hum ad code ko string mein nahi, balki ek khali container mein daalenge
-        const adContainerHTML = `<div id="modal-ad-container" class="ad-container"></div>`;
 
+    closeButton.addEventListener('click', closeModal);
+    window.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
+
+    function openTool(toolId, toolName) {
         modalBody.innerHTML = `<h2>${toolName}</h2>` 
-                            + (toolImplementations[toolId]?.html || `<div class="status">This tool is under development.</div>`)
-                            + adContainerHTML; // Khali container ko yahan joda gaya hai
+                            + (toolImplementations[toolId]?.html || `<div class="status">This tool is under development.</div>`);
+        
+        // Ad ko uthakar modal mein daalo
+        if(modalAdContent) {
+            modalBody.appendChild(modalAdContent);
+        }
 
         modal.style.display = 'block';
-
-        // Naye function ko call karke ad load karein
-        const adContainer = document.getElementById('modal-ad-container');
-        if (adContainer) {
-            loadModalAd(adContainer);
-        }
         
         if (toolImplementations[toolId]?.attach) {
             toolImplementations[toolId].attach();
         }
     }
-    // === NAYA CODE YAHAN KHATAM HOTA HAI ===
     
     // --- TOOL IMPLEMENTATIONS (SABHI TOOLS KA CODE) ---
     const toolImplementations = {
